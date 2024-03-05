@@ -13,7 +13,6 @@
 			"airflowProperties": {
 				"airflowVersion": "2.6.3",
 				"airflowWebUrl": "https://32243091941709.eastus.airflow.svc.datafactory.azure.com/login/",
-				"airflowEnvironmentVariables": null,
 				"airflowRequirements": [
 					"apache-airflow-providers-microsoft-azure",
 					"secure-smtplib",
@@ -21,12 +20,10 @@
 				],
 				"enableAADIntegration": true,
 				"enableTriggerers": false,
-				"userName": null,
-				"password": null,
 				"airflowEntityReferences": [],
 				"packageProviderPath": "plugins",
 				"encryptedSecrets": [],
-				"secrets": null
+				"secrets": []
 			}
 		}
 	}

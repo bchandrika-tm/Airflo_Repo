@@ -1,10 +1,5 @@
 {
 	"name": "df412",
-	"properties": {
-		"globalConfigurations": {
-			"PipelineBillingEnabled": "true"
-		}
-	},
 	"location": "eastus",
 	"identity": {
 		"type": "SystemAssigned",
