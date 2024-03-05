@@ -16,7 +16,8 @@
 				"airflowEnvironmentVariables": null,
 				"airflowRequirements": [
 					"apache-airflow-providers-microsoft-azure",
-					"secure-smtplib"
+					"secure-smtplib",
+					"pipinstall'apache-airflow-providers-sendgrid'--constraint..."
 				],
 				"enableAADIntegration": true,
 				"enableTriggerers": false,
