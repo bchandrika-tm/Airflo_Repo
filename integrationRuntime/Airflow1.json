@@ -18,7 +18,8 @@
 					"apache-airflow-providers-microsoft-azure",
 					"secure-smtplib",
 					"apache-airflow-providers-sendgrid",
-					"apache-airflow[amazon]"
+					"apache-airflow[amazon]",
+					"apache-airflow-providers-slack"
 				],
 				"enableAADIntegration": true,
 				"enableTriggerers": false,
