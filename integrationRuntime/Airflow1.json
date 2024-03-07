@@ -13,15 +13,22 @@
 			"airflowProperties": {
 				"airflowVersion": "2.6.3",
 				"airflowWebUrl": "https://32243091941709.eastus.airflow.svc.datafactory.azure.com/login/",
+				"airflowEnvironmentVariables": null,
 				"airflowRequirements": [
-					"apache-airflow-providers-microsoft-azure"
+					"apache-airflow-providers-microsoft-azure",
+					"secure-smtplib",
+					"apache-airflow-providers-sendgrid",
+					"apache-airflow[amazon]",
+					"apache-airflow-providers-slack"
 				],
 				"enableAADIntegration": true,
 				"enableTriggerers": false,
+				"userName": null,
+				"password": null,
 				"airflowEntityReferences": [],
 				"packageProviderPath": "plugins",
 				"encryptedSecrets": [],
-				"secrets": []
+				"secrets": null
 			}
 		}
 	}
