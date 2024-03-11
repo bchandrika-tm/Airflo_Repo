@@ -20,10 +20,13 @@ Create DAG file:
 4. Store JSON data in ADLS
 5. Schedule events to send notifications
 
-## Configure the Data Factory instance in Azure and launch the studio. Then, go to the 'Manage' section in the left side panel to find the Airflow instance. Spin up the resource, enabling Git sync during setup for easier synchronization with files when there are changes in DAGs. After setup, start monitoring the DAGs from the user interface.
+Configure the Data Factory instance in Azure and launch the studio. Then, go to the 'Manage' section in the left side panel to find the Airflow instance. Spin up the resource, enabling Git sync during setup for easier synchronization with files when there are changes in DAGs. After setup, start monitoring the DAGs from the user interface.
+
+Below are a few connections that need to be configured in the Airflow UI for the project, including connections for Data Factory, Jira, and blob storage.
 
 ## 1.1. Create a connection in Airflow for Azure Data Factory:
-This is same process as what we have done for creating a connection above for Jira.
+
+By configuring a connection in Airflow UI, it enables Airflow to seamlessly integrate with Data Factory, facilitating automated workflows and task execution within the project.
 
 Give the details as shown:
 
@@ -38,6 +41,8 @@ Give the details as shown:
 Test it, if it is successfully connected then save it and use it in DAG.
 
 ## 1.2. Create a connection for Jira in Airflow:
+
+Establishing a connection in Airflow for Jira enables seamless integration between Airflow workflows and Jira tasks or projects. This connection allows Airflow to interact with Jira's API, enabling tasks such as creating, updating, or querying issues, fetching project information, or managing workflows directly from Airflow.
 
 Open Airflow webserver and go to Admin in the top ribbon and go to 'connections'
 
@@ -72,6 +77,8 @@ Now, we need a connection for Airflow to Azure storage account.
 
 ## 1.3. Create a connection for blob storage in Airflow:
 
+Configuring a connection in Airflow for blob storage facilitates the integration of Airflow workflows with blob storage. This connection enables Airflow to securely access and manage files stored in blob storage containers as part of its data processing tasks.
+
 Add another connection as same way as above for blob storage.
 
 There are many ways to connect to blob storage: 
@@ -84,9 +91,9 @@ https://docs.astronomer.io/learn/connections/azure-blob-storage#:~:text=In%20the
 Follow above link to connect to blob storage, test it and save it.
 
 
-## 1.3. Create Airflow DAG and Tasks:
+## 1.4. Create Airflow DAG and Tasks:
 
-This is the python script for DAG and Tasks. There are 3 tasks in this DAG.
+This is the python script for DAG and Tasks. There are few tasks in this DAG.
 
 This script retrieves data from Jira using the connection established in Airflow. 
 
@@ -185,6 +192,20 @@ def extract_and_print_fields(ti):
 
 
 def upload_to_azure_storage(ti):
+"""
+    Uploads extracted data to Azure Blob Storage.
+
+    Parameters:
+        ti (TaskInstance): The task instance object provided by Airflow.
+
+    Returns:
+        str: The name of the uploaded blob for XCom communication.
+
+    This function retrieves extracted data from the 'extract_and_print_fields' task using XCom,
+    generates a unique blob name based on timestamp and UUID, converts the extracted data to a JSON string,
+    and uploads it to the specified container in Azure Blob Storage using the configured connection.
+    The blob name is returned for XCom communication.
+    """
     extracted_data = ti.xcom_pull(task_ids='extract_and_print_fields')
     hook = WasbHook(wasb_conn_id='adf_conn')
     container_name = 'airflow-destination'
@@ -200,7 +221,23 @@ def upload_to_azure_storage(ti):
     return blob_name
 
 
-def send_email_to_assignee(task_instance, **kwargs):
+def send_email_to_assignee(ti, **kwargs):
+"""
+    Sends email notifications to assignees based on task status.
+
+    Parameters:
+        task_instance (TaskInstance): The task instance object provided by Airflow.
+        **kwargs: Arbitrary keyword arguments. Expects 'ti' for accessing XCom.
+
+    Raises:
+        ValueError: If no XCom value is found, data format is invalid, or no valid tasks are found with assignee emails.
+        ImportError: If the required modules (WasbHook, json, logging) are not available.
+
+    This function retrieves the blob name from the 'upload_to_azure_storage' task using XCom,
+    reads the extracted data from Azure Blob Storage, filters tasks with assignee emails,
+    constructs email messages based on task status, and sends email notifications to assignees.
+    The sender's email address and password are used for authentication.
+    """
     ti = kwargs['ti']
     # Pulling the blob name from XCom
     blob_name = ti.xcom_pull(task_ids='upload_to_azure_storage')
@@ -240,6 +277,23 @@ def send_email_to_assignee(task_instance, **kwargs):
 
 
 def send_email(sender_email, password, receiver_email, subject, body):
+"""
+    Sends an email message using SMTP protocol.
+
+    Parameters:
+        sender_email (str): The sender's email address.
+        password (str): The sender's email password or authentication token.
+        receiver_email (str): The recipient's email address.
+        body (str): The content of the email message.
+
+    Raises:
+        SMTPException: If an error occurs during the SMTP connection or sending process.
+        ImportError: If the required modules (smtplib, email.mime.multipart, email.mime.text) are not available.
+
+    This function constructs an email message with the provided sender, recipient, subject, and body,
+    and sends it using the Simple Mail Transfer Protocol (SMTP) via the Gmail SMTP server.
+    The sender's email address and password are used for authentication.
+    """
     message = MIMEMultipart()
     message['From'] = sender_email
     message['To'] = receiver_email
@@ -296,7 +350,7 @@ with DAG('test_with_gmail',
 
 
 ```
-## 1.4. Run the DAG
+## 1.5. Run the DAG
 
 Upload the DAG to blob storage and create a linked service for Data Factory pointing to this blob storage.
 
@@ -308,6 +362,8 @@ or
 
 Enabling Git sync when configuring the Airflow instance in Data Factory simplifies the process of importing files into the
 
-Airflow instance whenever there is a change to that DAG
+Airflow instance whenever there is a change to DAG files.
 
 The DAG is scheduled to run daily automatically.
+
+The DAG can be paused or have its schedule_interval set to 'None' if the intention is not to run daily.
