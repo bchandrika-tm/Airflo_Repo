@@ -93,7 +93,7 @@ Follow above link to connect to blob storage, test it and save it.
 
 ## 1.4. Create Airflow DAG and Tasks:
 
-This is the python script for DAG and Tasks. There are few tasks in this DAG.
+gmail_dag.py is the python script for DAG and Tasks. There are few tasks in this DAG.
 
 This script retrieves data from Jira using the connection established in Airflow. 
 
