@@ -358,6 +358,9 @@ Then, navigate to Azure Data Factory, access the Airflow instance, and import th
 
 Login to the Airflow web server and monitor the DAG that runs successfully, sending emails out to the assignees.
 
+![image](https://github.com/bchandrika-tm/Airflo_Repo/assets/131654149/a04f9dce-5ae4-42c2-a9d0-4bdf6867734a)
+
+
 or
 
 Enabling Git sync when configuring the Airflow instance in Data Factory simplifies the process of importing files into the
